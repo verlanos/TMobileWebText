@@ -1,18 +1,20 @@
 TMobileWebText
 ==============
 
-Framework for sending WebTexts via T-Mobile/EE's portal. 
+### Framework for sending WebTexts via T-Mobile/EE's portal. 
 
 TMobile/EE allows you to send a Text Message to any Mobile Phone through their Web portal. 
 The cost of each text depends on your tariff. If you are planning on using their service on a regular basis
 consider taking a monthly plan with a generous text allowance. 
 
-Requirements
+### Requirements
 
 an EE/TMobile online account.
 Java 7 and higher
 
-Quick start
+### Quick start
+
+```
 
 ...
         String USERNAME = "username";
@@ -40,3 +42,4 @@ Quick start
         }
     }
 ...
+```
