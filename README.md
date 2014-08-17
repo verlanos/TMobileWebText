@@ -35,7 +35,8 @@ I am thinking about extending this framework by adding more providers of a WebTe
         String MESSAGE = "HELLO WORLD!";
         String RECIPIENT = "MOBILE_NUMBER";
 
-        TMobileWebTextMessager messager = new TMobileWebTextMessager(new UsernamePasswordCredentials(USERNAME,PASSWORD));
+        TMobileWebTextMessager messager = new TMobileWebTextMessager(
+                                                new UsernamePasswordCredentials(USERNAME,PASSWORD));
 
         try {
             messager.connect();
