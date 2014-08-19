@@ -29,13 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TMobileWebTextMessager {
-    private Credentials credentials;
-    private CloseableHttpClient httpClient;
-    private HttpHost httpHost;
-    private HttpClientContext context;
-    private String loginToken, messageToken;
-    private boolean canSend;
-
     private static final String HOST = "tmobile.ee.co.uk";
     private static final int PORT = 443;
     private static final String PROTOCOL = "https";
@@ -44,29 +37,30 @@ public class TMobileWebTextMessager {
     private static final String MESSAGE_SEND_PATH = "/service/your-account/private/wgt/send-text-processing/";
     private static final String MESSAGE_SENT_CONFIRMATION_PATH = "/service/your-account/private/wgt/sent-confirmation/";
     private static final String HOME = "/service/your-account/private/home/";
-
     private static final String PARAM_KEY_TOKEN = "org.apache.struts.taglib.html.TOKEN";
     private static final String PARAM_KEY_USERNAME = "username";
     private static final String PARAM_KEY_PASSWORD = "password";
     private static final String PARAM_KEY_SUBMIT = "submit";
-
     private static final String PARAM_KEY_SEND_COPY_TO_PHONE = "sendToMyPhone";
     private static final String PARAM_KEY_SEND_DELIVERY_REPORT = "sendDeliveryReport";
-
     private static final String PARAM_VAL_ON = "on";
     private static final String PARAM_VAL_OFF = "off";
-
     private static final String PARAM_VAL_LOGIN = "Log+In";
     private static final String PARAM_VAL_SEND = "Send";
-
     private static final String PARAM_KEY_MESSAGE = "message";
     private static final String PARAM_KEY_RECIPIENTS = "selectedRecipients";
+    private Credentials credentials;
+    private CloseableHttpClient httpClient;
+    private HttpHost httpHost;
+    private HttpClientContext context;
+    private String loginToken, messageToken;
+    private boolean canSend;
 
     public TMobileWebTextMessager(Credentials accountCredentials){
         this.credentials = accountCredentials;
     }
 
-    public void connect() throws IOException {
+    public void connect() throws Exception {
         initHostAddress();
         initClientAndContext();
         canSend = authenticate();
@@ -85,7 +79,7 @@ public class TMobileWebTextMessager {
         parameters.add(new BasicNameValuePair(PARAM_KEY_SEND_COPY_TO_PHONE,txtMessage.enabledSendCopyToPhone() ?
                 PARAM_VAL_ON : PARAM_VAL_OFF));
         parameters.add(new BasicNameValuePair(PARAM_KEY_SEND_DELIVERY_REPORT,
-                txtMessage.enableSendDeliveryReportToPhone() ? PARAM_VAL_ON:PARAM_VAL_OFF));
+                txtMessage.enabledSendDeliveryReportToPhone() ? PARAM_VAL_ON : PARAM_VAL_OFF));
         parameters.add(new BasicNameValuePair(PARAM_KEY_SUBMIT, PARAM_VAL_SEND));
 
         HttpPost messageSendRequest = createPOST(MESSAGE_SEND_PATH,new RequestConfiguration(parameters));
@@ -144,6 +138,7 @@ public class TMobileWebTextMessager {
         String pageBodyText = getLoginPageBody();
         loginToken = extractToken(pageBodyText);
     }
+
     private void acquireMessageToken() throws IOException{
         String pageBodyText = getPrepareMessagePageBody();
         messageToken = extractToken(pageBodyText);
@@ -169,7 +164,7 @@ public class TMobileWebTextMessager {
         parameters.add(new BasicNameValuePair(PARAM_KEY_PASSWORD,credentials.getPassword()));
         parameters.add(new BasicNameValuePair(PARAM_KEY_SUBMIT, PARAM_VAL_LOGIN));
 
-        HttpPost loginRequest = createPOST(LOGIN_PATH,new RequestConfiguration(Collections.EMPTY_LIST,parameters));
+        HttpPost loginRequest = createPOST(LOGIN_PATH, new RequestConfiguration(parameters));
         String pageBodyAsText = readAndConsumePage(loginRequest);
         return pageBodyAsText;
     }
@@ -191,20 +186,20 @@ public class TMobileWebTextMessager {
         return readAndConsumePage(pageRequest);
     }
     private HttpGet createGET(String pagePath) throws IOException {
-        return createGET(pagePath,RequestConfiguration.ZERO_CONFIGURATION);
+        return createGET(pagePath, Collections.EMPTY_LIST);
     }
-    private HttpGet createGET(String pagePath,RequestConfiguration headersOnly) throws IOException{
+
+    private HttpGet createGET(String pagePath, List<Header> listOfHeaders) throws IOException {
         HttpGet formSubmitRequest = new HttpGet(pagePath);
-        List<Header> requestHeaders = headersOnly.getRequestHeaders();
-        if(!requestHeaders.isEmpty()) {
-            formSubmitRequest.setHeaders(requestHeaders.toArray(new Header[requestHeaders.size()]));
+        if (!listOfHeaders.isEmpty()) {
+            formSubmitRequest.setHeaders(listOfHeaders.toArray(new Header[listOfHeaders.size()]));
         }
 
         return formSubmitRequest;
     }
     private HttpPost createPOST(String pagePath,RequestConfiguration headersAndParams) throws IOException {
         HttpPost formSubmitRequest = new HttpPost(pagePath);
-        UrlEncodedFormEntity formEntity = headersAndParams.createURLEncodedEntity();
+        UrlEncodedFormEntity formEntity = headersAndParams.createURLEncodedEntityFromParameters();
         formSubmitRequest.setEntity(formEntity);
         return formSubmitRequest;
     }

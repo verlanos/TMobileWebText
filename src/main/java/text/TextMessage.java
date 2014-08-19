@@ -20,5 +20,8 @@ public class TextMessage {
         return recipients;
     }
     public boolean enabledSendCopyToPhone(){return sendCopyToPhone;}
-    public boolean enableSendDeliveryReportToPhone(){return sendDeliveryReportToPhone;}
+
+    public boolean enabledSendDeliveryReportToPhone() {
+        return sendDeliveryReportToPhone;
+    }
 }

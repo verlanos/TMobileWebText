@@ -41,12 +41,14 @@ public class TextMessageBuilder {
     }
 
     public TextMessageBuilder addRecipient(String recipient){
-        recipients.add(recipient);
+        if (StringUtils.isNotEmpty(recipient))
+            recipients.add(recipient);
         return this;
     }
 
     public TextMessageBuilder addRecipients(List<String> recipients){
-        this.recipients.addAll(recipients);
+        if (recipients != null && !recipients.isEmpty())
+            this.recipients.addAll(recipients);
         return this;
     }
 
@@ -60,7 +62,7 @@ public class TextMessageBuilder {
                 StringUtils.join(recipients,","),
                 sendCopyToPhoneEnabled,
                 sendDeliveryReportToPhoneEnabled);
-
+        clear();
         return textMessage;
     }
 
