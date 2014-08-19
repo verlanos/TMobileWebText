@@ -53,7 +53,10 @@ I am thinking about extending this framework by adding more providers of a WebTe
             }
         } catch (Exception e) {
             ...
+        } finally {
+            messager.close();
         }
+        
     }
 ...
 ```
